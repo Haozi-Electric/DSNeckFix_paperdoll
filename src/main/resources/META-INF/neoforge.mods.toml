@@ -1,0 +1,62 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="dsneckfix"
+version="1.0.0"
+displayName="DS Neck Fix - PaperDoll Compat"
+authors="Hz, Deepseek"
+logoFile="icon.png"
+description='''
+Fixes rendering compatibility between DragonSurvival and PaperDoll
+and Ayame-PaperDoll. Ensures the first-person dragon model rendered
+by these paper doll mods displays the neck and head correctly,
+along with some other compatibility fixes.
+'''
+
+[[mixins]]
+config = "dsneckfix.mixins.json"
+
+[[dependencies.dsneckfix]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1.190,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.dsneckfix]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.1]"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.dsneckfix]]
+    modId="dragonsurvival"
+    type="required"
+    versionRange="[2.0.0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix]]
+    modId="geckolib"
+    type="required"
+    versionRange="[4.6,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix]]
+    modId="paperdoll"
+    type="optional"
+    versionRange="*"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix]]
+    modId="ayame_paperdoll"
+    type="optional"
+    versionRange="*"
+    ordering="AFTER"
+    side="CLIENT"
+
