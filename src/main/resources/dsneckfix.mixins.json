@@ -10,7 +10,8 @@
     "CompatDisplayNeckMixin",
     "DragonRendererMixin",
     "PaperDollRendererMixin",
-    "AyamePaperDollRendererMixin"
+    "AyamePaperDollRendererMixin",
+    "FuzsPaperDollRendererMixin"
   ],
   "injectors": {
     "maxShiftBy": 2
