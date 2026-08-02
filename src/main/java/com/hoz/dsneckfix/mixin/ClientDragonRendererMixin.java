@@ -29,8 +29,7 @@ public abstract class ClientDragonRendererMixin {
 
     /**
      * During compat rendering, pretend the player is never gliding so
-     * the dragon body always renders (even during sprint-flying) and
-     * {@code handleFlightMovement} skips its flight-animation branch.
+     * the dragon body always renders (even during sprint-flying).
      */
     @WrapOperation(method = "renderDragon", at = @At(value = "INVOKE",
             target = "Lby/dragonsurvivalteam/dragonsurvival/server/handlers/ServerFlightHandler;"
@@ -38,6 +37,24 @@ public abstract class ClientDragonRendererMixin {
             remap = false)
     private static boolean dsneckfix$forceRenderBody(final Player player,
                                                       final Operation<Boolean> original) {
+        if (DsNeckFix.isRenderingForCompat()) {
+            return false;
+        }
+        return original.call(player);
+    }
+
+    /**
+     * Newer DragonSurvival (post v2.0.57) extracts flight-movement
+     * calculations into a separate {@code handleFlightMovement} helper
+     * which has its own {@code isGliding} check that would otherwise be
+     * missed by the {@code renderDragon} wrap above.
+     */
+    @WrapOperation(method = "handleFlightMovement", at = @At(value = "INVOKE",
+            target = "Lby/dragonsurvivalteam/dragonsurvival/server/handlers/ServerFlightHandler;"
+                   + "isGliding(Lnet/minecraft/world/entity/player/Player;)Z"),
+            remap = false, require = 0)
+    private static boolean dsneckfix$forceRenderBodyInFlightMovement(final Player player,
+                                                                      final Operation<Boolean> original) {
         if (DsNeckFix.isRenderingForCompat()) {
             return false;
         }

@@ -3,7 +3,10 @@ package com.hoz.dsneckfix.mixin;
 import by.dragonsurvivalteam.dragonsurvival.client.render.entity.dragon.DragonRenderer;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
+import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.hoz.dsneckfix.DsNeckFix;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,5 +45,22 @@ public abstract class DragonRendererMixin {
         }
         MovementData.getData(player).bodyYaw = dsneckfix$savedBodyYaw;
         dsneckfix$needsRestore = false;
+    }
+
+    /**
+     * During compat rendering, suppress the gliding check inside
+     * {@code setupRender} so no pitch / roll rotation is applied
+     * to the dragon model in the PaperDoll preview.
+     */
+    @WrapOperation(method = "setupRender", at = @At(value = "INVOKE",
+            target = "Lby/dragonsurvivalteam/dragonsurvival/server/handlers/ServerFlightHandler;"
+                   + "isGliding(Lnet/minecraft/world/entity/player/Player;)Z"),
+            remap = false)
+    private boolean dsneckfix$forceRenderBodyInSetupRender(final Player player,
+                                                            final Operation<Boolean> original) {
+        if (DsNeckFix.isRenderingForCompat()) {
+            return false;
+        }
+        return original.call(player);
     }
 }
