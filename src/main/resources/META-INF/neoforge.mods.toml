@@ -4,7 +4,7 @@ license="MIT"
 
 [[mods]]
 modId="dsneckfix"
-version="1.1.0"
+version="1.1.1"
 displayName="DS Neck Fix - PaperDoll Compat"
 authors="Hz, Deepseek"
 logoFile="icon.png"

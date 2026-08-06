@@ -111,6 +111,8 @@ neoForge {
 
 dependencies {
     implementation "curse.maven:dragons-survival-420799:8010249"
+    compileOnly fileTree(dir: "${System.getProperty('user.home')}/.gradle/caches/modules-2/files-2.1/software.bernie.geckolib/geckolib-neoforge-1.21.1/4.8.4",
+            include: ['*/geckolib-neoforge-1.21.1-4.8.4.jar'])
 }
 
 // Publishing configuration
