@@ -8,6 +8,7 @@
   "client": [
     "ClientDragonRendererMixin",
     "CompatDisplayNeckMixin",
+    "DragonEntityMixin",
     "DragonRendererMixin",
     "DragonModelMixin",
     "PaperDollRendererMixin",

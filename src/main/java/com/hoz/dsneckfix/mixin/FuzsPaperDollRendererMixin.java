@@ -21,10 +21,12 @@ public abstract class FuzsPaperDollRendererMixin {
     @Inject(method = "renderEntityInInventoryUpdateRotations", at = @At("HEAD"), remap = false)
     private static void dsneckfix$onRenderHead(final CallbackInfo ci) {
         DsNeckFix.pushCompatRendering();
+        DsNeckFix.pushPaperDollGunData();
     }
 
     @Inject(method = "renderEntityInInventoryUpdateRotations", at = @At("RETURN"), remap = false)
     private static void dsneckfix$onRenderReturn(final CallbackInfo ci) {
         DsNeckFix.popCompatRendering();
+        DsNeckFix.popPaperDollGunData();
     }
 }

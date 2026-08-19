@@ -14,10 +14,12 @@ public abstract class PaperDollRendererMixin {
     @Inject(method = "render", at = @At("HEAD"), remap = false)
     private void dsneckfix$onRenderHead(final CallbackInfo ci) {
         DsNeckFix.pushCompatRendering();
+        DsNeckFix.pushPaperDollGunData();
     }
 
     @Inject(method = "render", at = @At("RETURN"), remap = false)
     private void dsneckfix$onRenderReturn(final CallbackInfo ci) {
         DsNeckFix.popCompatRendering();
+        DsNeckFix.popPaperDollGunData();
     }
 }
