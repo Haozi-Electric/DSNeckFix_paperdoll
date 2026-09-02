@@ -24,6 +24,10 @@ public abstract class DragonRendererMixin {
     @Unique
     private double dsneckfix$savedBodyYaw;
     @Unique
+    private float dsneckfix$savedPrevXRot;
+    @Unique
+    private float dsneckfix$savedPrevZRot;
+    @Unique
     private boolean dsneckfix$needsRestore;
 
     @Inject(method = "setupRender", at = @At("HEAD"), remap = false)
@@ -36,6 +40,15 @@ public abstract class DragonRendererMixin {
         final MovementData movement = MovementData.getData(player);
         dsneckfix$savedBodyYaw = movement.bodyYaw;
         movement.bodyYaw = player.yBodyRot;
+        // Newer DS gates the glide pose off dragon.prevXRot/prevZRot as well. When the
+        // wobble is disabled, zero them so the release condition (isGliding forced false
+        // below AND prevXRot/prevZRot == 0) keeps the body level; restore them at RETURN.
+        if (!DsNeckFix.isGlideWobbleEnabled()) {
+            dsneckfix$savedPrevXRot = dragon.prevXRot;
+            dsneckfix$savedPrevZRot = dragon.prevZRot;
+            dragon.prevXRot = 0;
+            dragon.prevZRot = 0;
+        }
         dsneckfix$needsRestore = true;
     }
 
@@ -47,13 +60,18 @@ public abstract class DragonRendererMixin {
             return;
         }
         MovementData.getData(player).bodyYaw = dsneckfix$savedBodyYaw;
+        if (!DsNeckFix.isGlideWobbleEnabled()) {
+            dragon.prevXRot = dsneckfix$savedPrevXRot;
+            dragon.prevZRot = dsneckfix$savedPrevZRot;
+        }
         dsneckfix$needsRestore = false;
     }
 
     /**
-     * During compat rendering, suppress the gliding check inside
-     * {@code setupRender} so no pitch / roll rotation is applied
-     * to the dragon model in the PaperDoll preview.
+     * During compat rendering with the wobble disabled, pretend the player is never
+     * gliding so the paper doll body stays level (no pitch / roll). When the wobble
+     * is enabled, the real gliding value is returned so the body banks like the world
+     * dragon.
      */
     @WrapOperation(method = "setupRender", at = @At(value = "INVOKE",
             target = "Lby/dragonsurvivalteam/dragonsurvival/server/handlers/ServerFlightHandler;"
@@ -61,7 +79,7 @@ public abstract class DragonRendererMixin {
             remap = false)
     private boolean dsneckfix$forceRenderBodyInSetupRender(final Player player,
                                                             final Operation<Boolean> original) {
-        if (DsNeckFix.isRenderingForCompat()) {
+        if (DsNeckFix.isRenderingForCompat() && !DsNeckFix.isGlideWobbleEnabled()) {
             return false;
         }
         return original.call(player);

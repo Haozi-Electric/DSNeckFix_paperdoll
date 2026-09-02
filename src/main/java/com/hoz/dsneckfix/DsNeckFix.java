@@ -34,6 +34,11 @@ public class DsNeckFix {
         return compatRenderingDepth > 0 && Config.PAPER_DOLL_HUMAN_SCALE.get();
     }
 
+    /** Whether the paper doll dragon is allowed to pitch / bank (wobble) while gliding. */
+    public static boolean isGlideWobbleEnabled() {
+        return Config.PAPER_DOLL_GLIDE_WOBBLE.get();
+    }
+
     public static void pushCompatRendering() {
         compatRenderingDepth++;
     }

@@ -12,6 +12,12 @@ public final class Config {
                     "Default: true")
             .define("paperDollHumanScale", true);
 
+    public static final ModConfigSpec.BooleanValue PAPER_DOLL_GLIDE_WOBBLE = BUILDER
+            .comment("Let the paper doll dragon pitch down and bank side to side while gliding,",
+                    "just like the dragon in the world. Only affects the paper doll rendering.",
+                    "Default: false")
+            .define("paperDollGlideWobble", false);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {
