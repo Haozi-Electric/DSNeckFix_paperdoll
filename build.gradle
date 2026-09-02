@@ -31,7 +31,12 @@ repositories {
 }
 
 base {
-    archivesName = "${mod_id}-paperdoll-compat"
+    archivesName = "dsneckfix_pdc_${minecraft_version}"
+}
+
+// Release jar name: dsneckfix_pdc_<mc>_<version>.jar
+jar {
+    archiveFileName = "dsneckfix_pdc_${minecraft_version}_${project.version}.jar"
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
