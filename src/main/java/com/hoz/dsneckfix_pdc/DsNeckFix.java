@@ -1,4 +1,4 @@
-package com.hoz.dsneckfix;
+package com.hoz.dsneckfix_pdc;
 
 import com.hoz.ds_tacz_compat.GunRenderData;
 import com.mojang.logging.LogUtils;
@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 
 @Mod(value = DsNeckFix.MOD_ID, dist = Dist.CLIENT)
 public class DsNeckFix {
-    public static final String MOD_ID = "dsneckfix";
+    public static final String MOD_ID = "dsneckfix_pdc";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     private static int compatRenderingDepth;

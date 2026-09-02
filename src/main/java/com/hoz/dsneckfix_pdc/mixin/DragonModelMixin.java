@@ -1,9 +1,9 @@
-package com.hoz.dsneckfix.mixin;
+package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.client.models.DragonModel;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
-import com.hoz.dsneckfix.DsNeckFix;
+import com.hoz.dsneckfix_pdc.DsNeckFix;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,4 +1,4 @@
-package com.hoz.dsneckfix;
+package com.hoz.dsneckfix_pdc;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 

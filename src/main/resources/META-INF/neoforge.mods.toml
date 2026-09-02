@@ -3,7 +3,7 @@ loaderVersion="[1,)"
 license="MIT"
 
 [[mods]]
-modId="dsneckfix"
+modId="dsneckfix_pdc"
 version="1.3.0"
 displayName="DS Neck Fix - PaperDoll Compat"
 authors="Hz, Deepseek"
@@ -20,44 +20,44 @@ and lets it pitch / bank while gliding.
 '''
 
 [[mixins]]
-config = "dsneckfix.mixins.json"
+config = "dsneckfix_pdc.mixins.json"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="neoforge"
     type="required"
     versionRange="[21.1.190,)"
     ordering="NONE"
     side="CLIENT"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="minecraft"
     type="required"
     versionRange="[1.21.1]"
     ordering="NONE"
     side="CLIENT"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="dragonsurvival"
     type="required"
     versionRange="[2.0.0,)"
     ordering="AFTER"
     side="CLIENT"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="geckolib"
     type="required"
     versionRange="[4.6,)"
     ordering="AFTER"
     side="CLIENT"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="paperdoll"
     type="optional"
     versionRange="*"
     ordering="AFTER"
     side="CLIENT"
 
-[[dependencies.dsneckfix]]
+[[dependencies.dsneckfix_pdc]]
     modId="ds_tacz_compat"
     type="optional"
     versionRange="[0,)"

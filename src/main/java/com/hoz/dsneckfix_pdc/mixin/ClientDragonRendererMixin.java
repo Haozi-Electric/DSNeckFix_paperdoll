@@ -1,9 +1,9 @@
-package com.hoz.dsneckfix.mixin;
+package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRenderer;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
-import com.hoz.dsneckfix.DsNeckFix;
+import com.hoz.dsneckfix_pdc.DsNeckFix;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.player.Player;

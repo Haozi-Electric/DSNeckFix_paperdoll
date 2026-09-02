@@ -1,7 +1,7 @@
-package com.hoz.dsneckfix.mixin;
+package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.compat.Compat;
-import com.hoz.dsneckfix.DsNeckFix;
+import com.hoz.dsneckfix_pdc.DsNeckFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -1,6 +1,6 @@
-package com.hoz.dsneckfix.mixin;
+package com.hoz.dsneckfix_pdc.mixin;
 
-import com.hoz.dsneckfix.DsNeckFix;
+import com.hoz.dsneckfix_pdc.DsNeckFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
