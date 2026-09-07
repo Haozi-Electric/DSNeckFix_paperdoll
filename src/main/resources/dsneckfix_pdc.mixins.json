@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "package": "com.hoz.dsneckfix_pdc.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "refmap": "dsneckfix_pdc.refmap.json",
+  "mixins": [
+    "DragonRenderDataAccessor"
+  ],
+  "client": [
+    "ClientConfigMixin",
+    "CompatDisplayNeckMixin",
+    "DragonRendererMixin",
+    "FuzsPaperDollRendererMixin",
+    "GuiEntityRendererMixin",
+    "GuiGraphicsExtractorMixin"
+  ],
+  "injectors": {
+    "maxShiftBy": 2
+  }
+}

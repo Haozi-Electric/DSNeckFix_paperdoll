@@ -1,0 +1,50 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="dsneckfix_pdc"
+version="1.0.0"
+displayName="DS Neck Fix - PaperDoll Compat"
+authors="Hz, Deepseek"
+logoFile="icon.png"
+description='''Fixes rendering compatibility between DragonSurvival and PaperDoll. Renders the player as their dragon in the paper doll — showing the neck/head and facing the body forward, following the player's head pitch, and swaying (dive pitch + tail) while gliding like the third-person dragon. Configurable: glide sway on/off, and keep the paper doll always shown instead of auto-hiding.'''
+
+[[mixins]]
+config = "dsneckfix_pdc.mixins.json"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="neoforge"
+    type="required"
+    versionRange="[26.1,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="minecraft"
+    type="required"
+    versionRange="[26.1,26.1.2]"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="dragonsurvival"
+    type="required"
+    versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="geckolib"
+    type="required"
+    versionRange="[5,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="paperdoll"
+    type="optional"
+    versionRange="*"
+    ordering="AFTER"
+    side="CLIENT"
+
