@@ -4,19 +4,16 @@ license="MIT"
 
 [[mods]]
 modId="dsneckfix_pdc"
-version="1.3.0"
+version="1.4.0"
 displayName="DS Neck Fix - PaperDoll Compat"
 authors="Hz, Deepseek"
 logoFile="icon.png"
 description='''
-Fixes rendering compatibility between DragonSurvival and PaperDoll
-(tr7zw/Fuzss). Ensures the first-person dragon model rendered by
-these paper doll mods displays the neck and head correctly, along
-with body orientation and sprint-flight fixes. When ds_tacz_compat
-is installed, also marks the paper doll render so guns display in
-the preview like third person. Optionally scales the paper doll
-dragon down to normal human height so large dragons fit on screen,
-and lets it pitch / bank while gliding.
+Rendering compatibility between DragonSurvival and paper doll mods
+(tr7zw PaperDoll, Fuzss PaperDoll and Yes Steve Model). Fixes the
+dragon neck/head and glide pose in paper doll previews, stabilises YSM
+GUI previews, and adds a client-side DragonSurvival / Yes Steve Model
+render priority switch for the local player and other players. 
 '''
 
 [[mixins]]
@@ -61,6 +58,13 @@ config = "dsneckfix_pdc.mixins.json"
     modId="ds_tacz_compat"
     type="optional"
     versionRange="[0,)"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.dsneckfix_pdc]]
+    modId="yes_steve_model"
+    type="optional"
+    versionRange="*"
     ordering="AFTER"
     side="CLIENT"
 

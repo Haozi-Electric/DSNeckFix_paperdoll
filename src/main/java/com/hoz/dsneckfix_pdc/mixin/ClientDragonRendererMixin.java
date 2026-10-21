@@ -1,9 +1,12 @@
 package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRenderer;
+import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
+import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
+import com.hoz.dsneckfix_pdc.ModelPriority;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.player.Player;
@@ -37,12 +40,22 @@ public abstract class ClientDragonRendererMixin {
     @Unique
     private static boolean dsneckfix$movementSaved;
 
-    @Inject(method = "renderDragon", at = @At("HEAD"), remap = false)
+    @Inject(method = "renderDragon", at = @At("HEAD"), remap = false, cancellable = true)
     private static void dsneckfix$saveMovement(final RenderPlayerEvent.Pre event, final CallbackInfo ci) {
-        if (!DsNeckFix.isRenderingForCompat() || dsneckfix$movementSaved) {
+        if (!(event.getEntity() instanceof Player player)) {
             return;
         }
-        if (!(event.getEntity() instanceof Player player)) {
+        if (ModelPriority.isYsmLoaded()
+                && ModelPriority.useYsm(player)
+                && DragonStateProvider.isDragon(player)) {
+            final DragonEntity dragon = ClientDragonRenderer.getDragon(player);
+            if (dragon != null) {
+                dragon.renderingWasCancelled = true;
+            }
+            ci.cancel();
+            return;
+        }
+        if (!DsNeckFix.isRenderingForCompat() || dsneckfix$movementSaved) {
             return;
         }
         MovementData movement = MovementData.getData(player);
@@ -78,6 +91,32 @@ public abstract class ClientDragonRendererMixin {
         dsneckfix$movementSaved = false;
     }
 
+    /**
+     * {@code prepareDragonRenderState} recalculates and overwrites
+     * {@link MovementData#bodyYaw} from the flight direction after our
+     * render HEAD hook. For YSM's paper doll the outer doll rotation already
+     * follows the player, so align the body with the view after DS is done
+     * calculating; otherwise the flight yaw is added on top and the body
+     * twists toward the take-off heading.
+     */
+    @Inject(method = "prepareDragonRenderState", at = @At("RETURN"), remap = false)
+    private static void dsneckfix$neutralizeYsmGlide(final Player player,
+                                                     final DragonEntity dragon,
+                                                     final float partialTick,
+                                                     final CallbackInfo ci) {
+        if (!DsNeckFix.isRenderingYsmPaperDoll() || !ServerFlightHandler.isGliding(player)) {
+            return;
+        }
+        final MovementData movement = MovementData.getData(player);
+        final float yaw = player.getViewYRot(partialTick);
+        movement.bodyYaw = yaw;
+        movement.bodyYawLastFrame = yaw;
+        movement.headYaw = 0;
+        movement.headYawLastFrame = 0;
+        movement.headPitch = player.getXRot();
+        movement.headPitchLastFrame = movement.headPitch;
+    }
+
     @WrapOperation(method = "renderDragon", at = @At(value = "INVOKE",
             target = "Lby/dragonsurvivalteam/dragonsurvival/server/handlers/ServerFlightHandler;"
                    + "isGliding(Lnet/minecraft/world/entity/player/Player;)Z"),
@@ -96,7 +135,10 @@ public abstract class ClientDragonRendererMixin {
             remap = false, require = 0)
     private static boolean dsneckfix$forceRenderBodyInFlightMovement(final Player player,
                                                                       final Operation<Boolean> original) {
-        if (DsNeckFix.isRenderingForCompat()) {
+        // This call computes the flight pitch / bank data used by setupRender.
+        // Keep it enabled when the paper doll wobble option is on, otherwise
+        // there is nothing for setupRender to apply.
+        if (DsNeckFix.isRenderingForCompat() && !DsNeckFix.isGlideWobbleEnabled()) {
             return false;
         }
         return original.call(player);

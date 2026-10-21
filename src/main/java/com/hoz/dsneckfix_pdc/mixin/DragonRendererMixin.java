@@ -39,15 +39,19 @@ public abstract class DragonRendererMixin {
         }
         final MovementData movement = MovementData.getData(player);
         dsneckfix$savedBodyYaw = movement.bodyYaw;
-        movement.bodyYaw = player.yBodyRot;
-        // Newer DS gates the glide pose off dragon.prevXRot/prevZRot as well. When the
-        // wobble is disabled, zero them so the release condition (isGliding forced false
-        // below AND prevXRot/prevZRot == 0) keeps the body level; restore them at RETURN.
+        // YSM controls the paper doll's facing itself; locking the body yaw
+        // here fights its orientation and makes the doll snap.
+        if (!DsNeckFix.isRenderingYsmPaperDoll()) {
+            movement.bodyYaw = player.yBodyRot;
+        }
+        // The paper doll's outer yaw skews the model-local Z roll axis into a
+        // yaw-like twist, so roll is suppressed in the preview. Pitch (front /
+        // back sway) is kept when the wobble option is enabled.
+        dsneckfix$savedPrevZRot = dragon.prevZRot;
+        dragon.prevZRot = 0;
         if (!DsNeckFix.isGlideWobbleEnabled()) {
             dsneckfix$savedPrevXRot = dragon.prevXRot;
-            dsneckfix$savedPrevZRot = dragon.prevZRot;
             dragon.prevXRot = 0;
-            dragon.prevZRot = 0;
         }
         dsneckfix$needsRestore = true;
     }
@@ -60,9 +64,9 @@ public abstract class DragonRendererMixin {
             return;
         }
         MovementData.getData(player).bodyYaw = dsneckfix$savedBodyYaw;
+        dragon.prevZRot = dsneckfix$savedPrevZRot;
         if (!DsNeckFix.isGlideWobbleEnabled()) {
             dragon.prevXRot = dsneckfix$savedPrevXRot;
-            dragon.prevZRot = dsneckfix$savedPrevZRot;
         }
         dsneckfix$needsRestore = false;
     }

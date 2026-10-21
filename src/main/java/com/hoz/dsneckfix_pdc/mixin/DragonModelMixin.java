@@ -25,7 +25,9 @@ public abstract class DragonModelMixin {
     @Inject(method = "applyMolangQueries", at = @At("HEAD"), remap = false)
     private void dsneckfix$overridePose(final AnimationState<DragonEntity> animationState,
                                          final double currentTick, final CallbackInfo ci) {
-        if (!DsNeckFix.isRenderingForCompat()) {
+        // YSM's paper doll applies its own body/head orientation. Overriding
+        // the movement data here makes the doll fight that control.
+        if (!DsNeckFix.isRenderingForCompat() || DsNeckFix.isRenderingYsmPaperDoll()) {
             return;
         }
 

@@ -1,0 +1,25 @@
+## 1.4.0
+
+- Added Yes Steve Model paper doll compatibility: DragonSurvival dragons
+  now keep their neck/head in YSM's HUD paper doll and paper-doll config
+  screen, and the YSM config preview uses the same compatibility path.
+- Added YSM glide fixes: body orientation follows the paper doll view,
+  the dragon no longer twists toward the take-off heading, and roll/bank
+  is kept out of the preview to avoid the lock-south twist. Paper doll
+  pitch wobble now works in YSM previews as well.
+- Added a one-stop DragonSurvival / Yes Steve Model render priority
+  switch (client config): two independent toggles choose the local
+  player model and other players' models when both mods are installed.
+  Defaults: self = DragonSurvival, others = YSM. The [ysm_compat]
+  section is hidden when YSM is not installed.
+- Added YSM UI preview scale isolation: YSM GUI and HUD previews use
+  normal player scale/height; the in-world YSM model still follows the
+  dragon's real scale.
+- Added a client-side DragonSurvival bite-state reset for self=YSM,
+  fixing the left/right click animation sticking on clients that render
+  an YSM-model player as a DragonSurvival dragon.
+- Fixed YSM model selection preview scaling inversely with dragon
+  growth.
+- Fixed DragonSurvival / Yes Steve Model render priority depending on
+  mod load order; DragonSurvival now renders deterministically when
+  selected.

@@ -7,12 +7,21 @@
   "mixins": [],
   "client": [
     "ClientDragonRendererMixin",
+    "ClientProxyMixin",
     "CompatDisplayNeckMixin",
     "DragonEntityMixin",
     "DragonRendererMixin",
     "DragonModelMixin",
     "PaperDollRendererMixin",
-    "FuzsPaperDollRendererMixin"
+    "FuzsPaperDollRendererMixin",
+    "InventoryScreenPreviewMixin",
+    "YsmGuiLayerManagerMixin",
+    "YsmHudLayerMixin",
+    "YsmOfficialRenderPriorityMixin",
+    "YsmPortRenderPriorityMixin",
+    "YsmScreenMixin",
+    "YsmUiPreviewHeightMixin",
+    "YsmUiPreviewScaleMixin"
   ],
   "injectors": {
     "maxShiftBy": 2

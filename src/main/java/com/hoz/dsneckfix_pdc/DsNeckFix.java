@@ -15,9 +15,12 @@ public class DsNeckFix {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     private static int compatRenderingDepth;
+    private static int ysmPaperDollDepth;
+    private static int ysmScreenPreviewDepth;
 
     private static boolean dsTaczLoaded;
     private static boolean dsTaczChecked;
+    private static boolean ysmPaperDollLayerLogged;
 
     public DsNeckFix(final ModContainer modContainer) {
         LOGGER.info("DS Neck Fix loaded");
@@ -46,6 +49,64 @@ public class DsNeckFix {
     public static void popCompatRendering() {
         if (compatRenderingDepth > 0) {
             compatRenderingDepth--;
+        }
+    }
+
+    /** True while YSM's own paper doll layer is rendering. */
+    public static boolean isRenderingYsmPaperDoll() {
+        return ysmPaperDollDepth > 0;
+    }
+
+    public static void pushYsmPaperDoll() {
+        ysmPaperDollDepth++;
+    }
+
+    public static void popYsmPaperDoll() {
+        if (ysmPaperDollDepth > 0) {
+            ysmPaperDollDepth--;
+        }
+    }
+
+    /** True while a YSM GUI or HUD paper doll is rendering the local player. */
+    public static boolean isYsmScreenPreview() {
+        return ysmScreenPreviewDepth > 0;
+    }
+
+    public static void pushYsmScreenPreview() {
+        ysmScreenPreviewDepth++;
+    }
+
+    public static void popYsmScreenPreview() {
+        if (ysmScreenPreviewDepth > 0) {
+            ysmScreenPreviewDepth--;
+        }
+    }
+
+    /**
+     * YSM registers its extra player render (paper doll) as a HUD
+     * {@code LayeredDraw.Layer}. Obfuscation changes class and method names
+     * between builds, but the package stays stable, so this is the
+     * version-independent anchor for the layer hook.
+     */
+    public static boolean isYsmPaperDollLayer(final Object layer) {
+        return isYsmPackage(layer.getClass().getName());
+    }
+
+    /** YSM's paper doll config preview is rendered from its own Screen. */
+    public static boolean isYsmScreen(final Object screen) {
+        return isYsmPackage(screen.getClass().getName());
+    }
+
+    private static boolean isYsmPackage(final String name) {
+        return name.startsWith("com.elfmcys.yesstevemodel.")
+                || name.startsWith("com.elfmcys.ysm.")
+                || name.startsWith("rip.ysm.");
+    }
+
+    public static void logYsmPaperDollLayerOnce() {
+        if (!ysmPaperDollLayerLogged) {
+            ysmPaperDollLayerLogged = true;
+            LOGGER.info("YSM paper doll HUD layer detected; paper doll compat rendering enabled");
         }
     }
 
