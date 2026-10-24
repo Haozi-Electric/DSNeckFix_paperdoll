@@ -1,12 +1,11 @@
 package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRenderer;
-import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
 import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
 import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
-import com.hoz.dsneckfix_pdc.ModelPriority;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.player.Player;
@@ -40,19 +39,10 @@ public abstract class ClientDragonRendererMixin {
     @Unique
     private static boolean dsneckfix$movementSaved;
 
-    @Inject(method = "renderDragon", at = @At("HEAD"), remap = false, cancellable = true)
-    private static void dsneckfix$saveMovement(final RenderPlayerEvent.Pre event, final CallbackInfo ci) {
+    @Inject(method = "renderDragon", at = @At("HEAD"), remap = false)
+    private static void dsneckfix$saveMovement(final RenderPlayerEvent.Pre event,
+                                               final CallbackInfo ci) {
         if (!(event.getEntity() instanceof Player player)) {
-            return;
-        }
-        if (ModelPriority.isYsmLoaded()
-                && ModelPriority.useYsm(player)
-                && DragonStateProvider.isDragon(player)) {
-            final DragonEntity dragon = ClientDragonRenderer.getDragon(player);
-            if (dragon != null) {
-                dragon.renderingWasCancelled = true;
-            }
-            ci.cancel();
             return;
         }
         if (!DsNeckFix.isRenderingForCompat() || dsneckfix$movementSaved) {
@@ -91,14 +81,17 @@ public abstract class ClientDragonRendererMixin {
         dsneckfix$movementSaved = false;
     }
 
-    /**
-     * {@code prepareDragonRenderState} recalculates and overwrites
-     * {@link MovementData#bodyYaw} from the flight direction after our
-     * render HEAD hook. For YSM's paper doll the outer doll rotation already
-     * follows the player, so align the body with the view after DS is done
-     * calculating; otherwise the flight yaw is added on top and the body
-     * twists toward the take-off heading.
-     */
+    /** Keep preview movement data out of the real player's MovementData. */
+    @ModifyExpressionValue(
+            method = "prepareDragonRenderState(Lnet/minecraft/world/entity/player/Player;Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;F)V",
+            at = @At(value = "FIELD",
+                    target = "Lby/dragonsurvivalteam/dragonsurvival/common/entity/DragonEntity;isInInventory:Z"),
+            remap = false, require = 1)
+    private static boolean dsneckfix$skipPreviewMovementData(final boolean original) {
+        return original || DsNeckFix.isRenderingForCompat();
+    }
+
+    /** YSM's doll already follows the view; keep the flight yaw from twisting it. */
     @Inject(method = "prepareDragonRenderState", at = @At("RETURN"), remap = false)
     private static void dsneckfix$neutralizeYsmGlide(final Player player,
                                                      final DragonEntity dragon,
@@ -135,9 +128,6 @@ public abstract class ClientDragonRendererMixin {
             remap = false, require = 0)
     private static boolean dsneckfix$forceRenderBodyInFlightMovement(final Player player,
                                                                       final Operation<Boolean> original) {
-        // This call computes the flight pitch / bank data used by setupRender.
-        // Keep it enabled when the paper doll wobble option is on, otherwise
-        // there is nothing for setupRender to apply.
         if (DsNeckFix.isRenderingForCompat() && !DsNeckFix.isGlideWobbleEnabled()) {
             return false;
         }

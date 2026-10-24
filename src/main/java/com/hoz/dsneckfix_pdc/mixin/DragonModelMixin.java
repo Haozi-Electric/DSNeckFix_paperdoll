@@ -11,22 +11,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import software.bernie.geckolib.animation.AnimationState;
 
-/**
- * Overrides select MovementData fields at the point where DS feeds them
- * into Molang queries, so the paper doll's pose drives head pitch / yaw
- * and tail orientation without fighting the real player's data.
- * <p>
- * bodyYaw is re-applied here because DragonRendererMixin restores it
- * at setupRender RETURN, which is before the animation system reads it.
- */
+/** Feed paper-doll pose values into the Molang queries DS uses for head/body. */
 @Mixin(value = DragonModel.class, remap = false)
 public abstract class DragonModelMixin {
 
     @Inject(method = "applyMolangQueries", at = @At("HEAD"), remap = false)
     private void dsneckfix$overridePose(final AnimationState<DragonEntity> animationState,
                                          final double currentTick, final CallbackInfo ci) {
-        // YSM's paper doll applies its own body/head orientation. Overriding
-        // the movement data here makes the doll fight that control.
+        // YSM's paper doll applies its own body/head orientation.
         if (!DsNeckFix.isRenderingForCompat() || DsNeckFix.isRenderingYsmPaperDoll()) {
             return;
         }
@@ -41,6 +33,10 @@ public abstract class DragonModelMixin {
         MovementData movement = MovementData.getData(player);
         movement.bodyYaw = player.yBodyRot;
         movement.bodyYawLastFrame = movement.bodyYaw;
+        if (player.isPassenger() || !player.getPassengers().isEmpty()) {
+            // Forcing head angles while riding makes the head snap forward on animation changes.
+            return;
+        }
         movement.headYaw = 0;
         movement.headYawLastFrame = 0;
         movement.headPitch = player.getXRot();

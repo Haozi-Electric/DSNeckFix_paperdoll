@@ -1,0 +1,7 @@
+## 1.4.1
+
+- Fixed the dragon passenger body orientation while riding a dragon.
+- Fixed the dragon head snapping forward for one frame when animations change
+  while riding.
+- Removed the unstable DragonSurvival / Yes Steve Model render priority switch
+  and its [ysm_compat] config section.

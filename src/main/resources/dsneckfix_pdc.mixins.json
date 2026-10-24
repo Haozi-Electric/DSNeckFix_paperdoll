@@ -7,7 +7,6 @@
   "mixins": [],
   "client": [
     "ClientDragonRendererMixin",
-    "ClientProxyMixin",
     "CompatDisplayNeckMixin",
     "DragonEntityMixin",
     "DragonRendererMixin",
@@ -17,8 +16,6 @@
     "InventoryScreenPreviewMixin",
     "YsmGuiLayerManagerMixin",
     "YsmHudLayerMixin",
-    "YsmOfficialRenderPriorityMixin",
-    "YsmPortRenderPriorityMixin",
     "YsmScreenMixin",
     "YsmUiPreviewHeightMixin",
     "YsmUiPreviewScaleMixin"

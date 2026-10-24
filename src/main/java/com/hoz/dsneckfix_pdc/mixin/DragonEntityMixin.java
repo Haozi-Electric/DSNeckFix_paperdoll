@@ -7,12 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * While the paper doll is rendering a dragon, pins the render scale to
- * normal human height (1.0) instead of the growth-stage scale, so large
- * dragons no longer overflow the on-screen preview. Only active during
- * paper doll rendering — world and third-person rendering are untouched.
- */
+/** Render dragons at human height while a paper doll is active. */
 @Mixin(value = DragonEntity.class, remap = false)
 public abstract class DragonEntityMixin {
 

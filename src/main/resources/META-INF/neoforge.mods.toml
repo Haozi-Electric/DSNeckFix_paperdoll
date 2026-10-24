@@ -4,16 +4,15 @@ license="MIT"
 
 [[mods]]
 modId="dsneckfix_pdc"
-version="1.4.0"
+version="1.4.1"
 displayName="DS Neck Fix - PaperDoll Compat"
 authors="Hz, Deepseek"
 logoFile="icon.png"
 description='''
 Rendering compatibility between DragonSurvival and paper doll mods
 (tr7zw PaperDoll, Fuzss PaperDoll and Yes Steve Model). Fixes the
-dragon neck/head and glide pose in paper doll previews, stabilises YSM
-GUI previews, and adds a client-side DragonSurvival / Yes Steve Model
-render priority switch for the local player and other players. 
+dragon neck/head and glide pose in paper doll previews and stabilises
+YSM GUI previews.
 '''
 
 [[mixins]]
