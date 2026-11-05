@@ -1,0 +1,12 @@
+{
+  "dsneckfix_pdc.configuration.paperDollHumanScale": "Scale paper doll to human size",
+  "dsneckfix_pdc.configuration.paperDollHumanScale.tooltip": "Scale the dragon model to normal human height in the paper doll preview.\nDefault: true",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations": "Dragon hurt and death animations",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations.tooltip": "Show DragonSurvival dragons with the vanilla hurt flash and death fall.\nDefault: true",
+  "dsneckfix_pdc.configuration.paperDollGlideWobble": "Paper doll glide pitch",
+  "dsneckfix_pdc.configuration.paperDollGlideWobble.tooltip": "Let the paper doll dragon pitch up and down while gliding like the world dragon.\nDefault: false",
+  "dsneckfix_pdc.configuration.paperDollRidingChain": "Paper doll riding chain",
+  "dsneckfix_pdc.configuration.paperDollRidingChain.tooltip": "Render the full riding chain in the paper doll.\nOnly supports tr7zw and Fuzs paper dolls; YSM is not supported.\nDefault: true",
+  "dsneckfix_pdc.configuration.paperDollRidingChainAutoFit": "Auto-fit riding chain",
+  "dsneckfix_pdc.configuration.paperDollRidingChainAutoFit.tooltip": "Keep the whole riding chain on screen.\nOnly used when paperDollRidingChain is enabled.\nDefault: true"
+}

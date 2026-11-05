@@ -17,6 +17,7 @@ public class DsNeckFix {
     private static int compatRenderingDepth;
     private static int ysmPaperDollDepth;
     private static int ysmScreenPreviewDepth;
+    private static int chainRenderingDepth;
 
     private static boolean dsTaczLoaded;
     private static boolean dsTaczChecked;
@@ -33,7 +34,26 @@ public class DsNeckFix {
     }
 
     public static boolean isPaperDollHumanScaleEnabled() {
-        return compatRenderingDepth > 0 && Config.PAPER_DOLL_HUMAN_SCALE.get();
+        // The riding chain normalizes the whole group instead of each dragon.
+        return compatRenderingDepth > 0 && chainRenderingDepth == 0 && Config.PAPER_DOLL_HUMAN_SCALE.get();
+    }
+
+    public static boolean isPaperDollRidingChainEnabled() {
+        return Config.PAPER_DOLL_RIDING_CHAIN.get();
+    }
+
+    public static boolean isRenderingRidingChain() {
+        return chainRenderingDepth > 0;
+    }
+
+    public static void pushChainRendering() {
+        chainRenderingDepth++;
+    }
+
+    public static void popChainRendering() {
+        if (chainRenderingDepth > 0) {
+            chainRenderingDepth--;
+        }
     }
 
     public static boolean isGlideWobbleEnabled() {

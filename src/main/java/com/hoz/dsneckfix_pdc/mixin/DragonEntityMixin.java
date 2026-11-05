@@ -17,4 +17,13 @@ public abstract class DragonEntityMixin {
             cir.setReturnValue(1.0F);
         }
     }
+
+    /** DS 2.0.72 only advances animations for paused inventory/UI renders; the paper doll is a UI render. */
+    @Inject(method = "shouldPlayAnimsWhileGamePaused", at = @At("RETURN"),
+            cancellable = true, require = 0, remap = false)
+    private void dsneckfix$playAnimsWhilePaused(final CallbackInfoReturnable<Boolean> cir) {
+        if (DsNeckFix.isRenderingForCompat()) {
+            cir.setReturnValue(true);
+        }
+    }
 }

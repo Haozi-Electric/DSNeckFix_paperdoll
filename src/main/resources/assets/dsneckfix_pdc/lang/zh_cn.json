@@ -1,0 +1,12 @@
+{
+  "dsneckfix_pdc.configuration.paperDollHumanScale": "纸缩放至人类体型",
+  "dsneckfix_pdc.configuration.paperDollHumanScale.tooltip": "于纸娃娃预览中把龙模型缩放至普通人类身高。\n默认：true",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations": "龙受伤与死亡动画",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations.tooltip": "使龙之生存的龙显示原版的受伤红光与死亡倾倒动画。\n默认：true",
+  "dsneckfix_pdc.configuration.paperDollGlideWobble": "纸娃娃滑翔俯仰",
+  "dsneckfix_pdc.configuration.paperDollGlideWobble.tooltip": "滑翔时让纸娃娃中的龙像世界中的龙一样上下俯仰。\n默认：false",
+  "dsneckfix_pdc.configuration.paperDollRidingChain": "纸娃娃骑乘链",
+  "dsneckfix_pdc.configuration.paperDollRidingChain.tooltip": "使纸娃娃渲染完整骑乘链\n仅支持 tr7zw 和 Fuzs 的纸娃娃，不支持YSM\n默认：true",
+  "dsneckfix_pdc.configuration.paperDollRidingChainAutoFit": "骑乘链自动适配",
+  "dsneckfix_pdc.configuration.paperDollRidingChainAutoFit.tooltip": "让整条骑乘链保持在屏幕内\n仅在 paperDollRidingChain 启用时生效。\n默认：true"
+}
