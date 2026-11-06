@@ -4,12 +4,11 @@ import by.dragonsurvivalteam.dragonsurvival.client.render.ClientDragonRenderer;
 import by.dragonsurvivalteam.dragonsurvival.client.render.entity.dragon.DragonRenderer;
 import by.dragonsurvivalteam.dragonsurvival.common.capability.DragonStateProvider;
 import by.dragonsurvivalteam.dragonsurvival.common.entity.DragonEntity;
-import by.dragonsurvivalteam.dragonsurvival.registry.attachments.MovementData;
-import by.dragonsurvivalteam.dragonsurvival.server.handlers.ServerFlightHandler;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
+import com.hoz.dsneckfix_pdc.client.LegacyMovementRefresh;
+import com.hoz.dsneckfix_pdc.client.PaperDollSway;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mth;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -45,13 +44,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "fuzs.paperdoll.common.client.util.PaperDollRenderer", remap = false)
 public abstract class FuzsPaperDollRendererMixin {
 
-    /** Smoothes the glide pitch ramp for the paper doll. */
-    @Unique
-    private static float dsneckfix$lastPitch;
-
-    @Unique
-    private static final float FLIGHT_TILT_LERP = 0.4F;
-
     /**
      * At the paper doll's render-state extraction, if the entity is a dragon player, replace the
      * (player) state with the LIVE dragon render state. The live dragon's controllers read the player's
@@ -63,59 +55,42 @@ public abstract class FuzsPaperDollRendererMixin {
      * and only face the body forward. The neck display + centring are done by
      * {@link GuiEntityRendererMixin} pushing the compat flag around the actual render pass.
      */
-    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private static void dsneckfix$renderDragonWithMovement(
             final LivingEntity livingEntity, final float partialTick,
             final CallbackInfoReturnable<LivingEntityRenderState> cir) {
-        if (!(livingEntity instanceof Player player) || !DragonStateProvider.isDragon(player)) {
-            return;
-        }
-        DragonEntity dragon = ClientDragonRenderer.getDragon(player);
-        if (dragon == null) {
-            return;
-        }
-        // First-person glide leaves MovementData stale: it is only refreshed (setDragonMovementData /
-        // handleFlightMovement) when the world dragon's bones are needed (i.e. mounting), not every
-        // frame while hidden. updateAnimationState derives the head/tail PHYSICAL animation from these
-        // deltas, so a stale MovementData is exactly why the paper doll's head/tail freeze at the
-        // pre-glide value. Refresh it before building the render state.
-        ClientDragonRenderer.setDragonMovementData(player, Minecraft.getInstance().getDeltaTracker().getRealtimeDeltaTicks());
-        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        EntityRenderer<? super LivingEntity, ?> renderer = dispatcher.getRenderer(dragon);
-        EntityRenderState renderState = renderer.createRenderState(dragon, partialTick);
-        if (renderState instanceof GeoRenderState geo) {
-            DragonRenderer.DragonRenderData renderData = geo.getGeckolibData(DragonRenderer.DRAGON_RENDER_DATA);
-            if (renderData != null) {
-                // Keep the dragon as a NON-UI render (so DS does NOT skip the animation-transition
-                // smoothing — that is what made inUI stutter). Only face the body forward; everything
-                // else (head/neck/tail animation, dimensions) is left as the live dragon so it follows
-                // the player's view and flight naturally. The neck display and centring are handled by
-                // GuiEntityRendererMixin (compat flag) so they stay smooth and never leak to the world.
-                DragonRenderDataAccessor accessor = (DragonRenderDataAccessor) (Object) renderData;
-                accessor.ds$setBodyYaw(0.0D);
-                MovementData movement = MovementData.getData(player);
-                if (DsNeckFix.isGlideSwayEnabled()) {
-                    // Drive the flight pitch from the vertical velocity (clamp(dy*20), smoothed) instead
-                    // of movement.prevXRot, which is stale in first person — so the paper doll dives like
-                    // the third-person dragon. The paper doll view is flipped, so negate to keep down = down.
-                    float pitchTarget = ServerFlightHandler.isGliding(player)
-                            ? Mth.clamp((float) (player.getDeltaMovement().y * 20), -80, 80) : 0;
-                    dsneckfix$lastPitch = Mth.lerp(FLIGHT_TILT_LERP, dsneckfix$lastPitch, pitchTarget);
-                    accessor.ds$setPrevXRot(-dsneckfix$lastPitch);
-                    // With MovementData now refreshed, feed the tail the raw vertical motion (no glide-pitch
-                    // damping) so it keeps its weight instead of going stone-still while gliding.
-                    accessor.ds$setCurrentTailMotionUp(Mth.clamp(-movement.deltaMovement.y * 10.0F, -10.0F, 10.0F));
-                } else {
-                    // Sway disabled: keep the paper doll level with a straight tail while gliding.
-                    accessor.ds$setPrevXRot(0);
-                    accessor.ds$setCurrentTailMotionUp(0);
+        try {
+            if (!(livingEntity instanceof Player player) || !DragonStateProvider.isDragon(player)) {
+                return;
+            }
+            DragonEntity dragon = ClientDragonRenderer.getDragon(player);
+            if (dragon == null) {
+                return;
+            }
+            // DS 2.1.7 ticks movement on the client; older 26.1 builds need this render-time refresh.
+            LegacyMovementRefresh.refresh(player);
+            EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+            EntityRenderer<? super LivingEntity, ?> renderer = dispatcher.getRenderer(dragon);
+            EntityRenderState renderState = renderer.createRenderState(dragon, partialTick);
+            if (renderState instanceof GeoRenderState geo) {
+                DragonRenderer.DragonRenderData renderData = geo.getGeckolibData(DragonRenderer.DRAGON_RENDER_DATA);
+                if (renderData != null) {
+                    DragonRenderDataAccessor accessor = (DragonRenderDataAccessor) (Object) renderData;
+                    accessor.ds$setBodyYaw(0.0D);
+                    if (DsNeckFix.isPaperDollHumanScaleEnabled()) {
+                        accessor.ds$setVisualScale(1.0D);
+                        accessor.ds$setBodyScaleMultiplier(1.0F);
+                    }
+                    PaperDollSway.apply(renderData, player);
                 }
             }
+            LivingEntityRenderState living = (LivingEntityRenderState) renderState;
+            living.lightCoords = 15728880;
+            living.shadowPieces.clear();
+            living.outlineColor = 0;
+            cir.setReturnValue(living);
+        } catch (final RuntimeException | LinkageError ignored) {
+            // New DS/Fuzs version: let the host render its normal player model.
         }
-        LivingEntityRenderState living = (LivingEntityRenderState) renderState;
-        living.lightCoords = 15728880;
-        living.shadowPieces.clear();
-        living.outlineColor = 0;
-        cir.setReturnValue(living);
     }
 }

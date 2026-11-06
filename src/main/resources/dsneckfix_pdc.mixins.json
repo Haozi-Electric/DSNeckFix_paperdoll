@@ -1,11 +1,12 @@
 {
-  "required": true,
+  "required": false,
   "package": "com.hoz.dsneckfix_pdc.mixin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "refmap": "dsneckfix_pdc.refmap.json",
   "mixins": [
-    "DragonRenderDataAccessor"
+    "DragonRenderDataAccessor",
+    "DragonRendererAccessor"
   ],
   "client": [
     "ClientConfigMixin",

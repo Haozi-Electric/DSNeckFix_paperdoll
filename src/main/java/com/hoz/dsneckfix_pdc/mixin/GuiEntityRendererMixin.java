@@ -2,54 +2,84 @@ package com.hoz.dsneckfix_pdc.mixin;
 
 import by.dragonsurvivalteam.dragonsurvival.client.render.entity.dragon.DragonRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
+import com.hoz.dsneckfix_pdc.client.BoneCacheGuard;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Scopes the compat flag to the paper doll's OWN render pass. {@code GuiEntityRenderer.renderToTexture}
- * is the deferred pass that {@code GuiGraphicsExtractor.entity} queues into: it calls
- * {@code entityRenderDispatcher.submit(...)} and then {@code featureRenderDispatcher.renderAllFeatures()},
- * and it is in {@code renderAllFeatures} that DragonSurvival reads {@code Compat.displayNeck} (neck
- * visibility) and runs the model pose (getModelOffset). By pushing the compat flag around exactly this
- * call — and only when the submitted entity is a non-inUI dragon (our paper doll) — the neck display and
- * centring fixes apply smoothly, and the flag can never leak into the world/first-person render (the
- * world dragon never goes through GuiEntityRenderer).
+ * Scopes the compat flag and DS's shared bone caches to the paper doll's OWN render pass.
+ * {@code GuiEntityRenderer.renderToTexture} is the deferred pass that {@code GuiGraphicsExtractor.entity}
+ * queues into. DS reads {@code Compat.displayNeck} and runs the model pose there, and its bone updaters
+ * write the shared world caches from GUI space. Wrapping exactly this pass — and only for a non-inUI
+ * dragon render state (our paper doll) — keeps the fixes local and the world/first-person render clean.
  */
 @Mixin(GuiEntityRenderer.class)
 public abstract class GuiEntityRendererMixin {
 
-    @Inject(method = "renderToTexture", at = @At("HEAD"), remap = false)
-    private void dsneckfix$push(final GuiEntityRenderState entityState, final PoseStack poseStack, final CallbackInfo ci) {
-        if (dsneckfix$isPaperDollDragon(entityState.renderState())) {
-            DsNeckFix.pushCompatRendering();
+    @WrapMethod(method = "renderToTexture", remap = false)
+    private void dsneckfix$scopeCompat(final GuiEntityRenderState entityState, final PoseStack poseStack,
+                                       final Operation<Void> original) {
+        DragonRenderer.DragonRenderData data = null;
+        try {
+            data = dsneckfix$paperDollData(entityState.renderState());
+        } catch (final RuntimeException | LinkageError ignored) {
+            // Unknown DS version: fall through to the host's normal render.
         }
-    }
+        if (data == null) {
+            original.call(entityState, poseStack);
+            return;
+        }
 
-    @Inject(method = "renderToTexture", at = @At("RETURN"), remap = false)
-    private void dsneckfix$pop(final GuiEntityRenderState entityState, final PoseStack poseStack, final CallbackInfo ci) {
-        if (dsneckfix$isPaperDollDragon(entityState.renderState())) {
+        boolean guarded = false;
+        try {
+            BoneCacheGuard.begin(ds$dragonId(data));
+            guarded = true;
+        } catch (final RuntimeException | LinkageError ignored) {
+            // Bone cache layout changed; compat rendering still works without the guard.
+        }
+        DsNeckFix.pushCompatRendering();
+        try {
+            original.call(entityState, poseStack);
+        } finally {
             DsNeckFix.popCompatRendering();
+            if (guarded) {
+                try {
+                    BoneCacheGuard.restoreAll();
+                } catch (final RuntimeException | LinkageError ignored) {
+                    // Ignore; the cache guard is best-effort.
+                }
+            }
         }
     }
 
     @Unique
-    private static boolean dsneckfix$isPaperDollDragon(final EntityRenderState state) {
-        if (state instanceof GeoRenderState geo) {
-            DragonRenderer.DragonRenderData data = geo.getGeckolibData(DragonRenderer.DRAGON_RENDER_DATA);
-            if (data != null) {
-                // Our paper doll extracts the dragon with inUI false; DS's own UI dragons (inventory/
-                // smithing) leave inUI true, so we only wrap the paper doll's render.
-                return !((DragonRenderDataAccessor) (Object) data).ds$getInUI();
-            }
+    private static int ds$dragonId(final DragonRenderer.DragonRenderData data) {
+        try {
+            return data.dragonId();
+        } catch (final RuntimeException | LinkageError ignored) {
+            return -1;
         }
-        return false;
+    }
+
+    @Unique
+    private static DragonRenderer.DragonRenderData dsneckfix$paperDollData(final EntityRenderState state) {
+        try {
+            if (state instanceof GeoRenderState geo) {
+                final DragonRenderer.DragonRenderData data = geo.getGeckolibData(DragonRenderer.DRAGON_RENDER_DATA);
+                if (data != null && !((DragonRenderDataAccessor) (Object) data).ds$getInUI()) {
+                    return data;
+                }
+            }
+        } catch (final RuntimeException | LinkageError ignored) {
+            // New DS version; treat as a non-dragon state.
+        }
+        return null;
     }
 }

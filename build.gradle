@@ -120,7 +120,7 @@ dependencies {
 
     // DragonSurvival 26.1.2. Prefer a locally-provided jar so you can develop offline /
     // against a specific DS build; otherwise fall back to the CurseForge maven artifact.
-    // libs/ is git-ignored, so a fresh clone resolves the maven artifact (DragonSurvival-26.1.2-v2.1.5-beta).
+    // libs/ is git-ignored, so a fresh clone resolves the maven artifact (DragonSurvival-26.1.2-v2.1.7-beta).
     def dsJar = fileTree(dir: 'libs', include: ['DragonSurvival-26.1*.jar'])
     if (dsJar.isEmpty()) {
         implementation 'curse.maven:dragons-survival-420799:8781972'

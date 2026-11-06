@@ -17,6 +17,12 @@ public final class Config {
                     "中文：一直显示纸娃娃，而不是让它自动隐藏。默认：false")
             .define("paperDollAlwaysShow", false);
 
+    public static final ModConfigSpec.BooleanValue PAPER_DOLL_HUMAN_SCALE = BUILDER
+            .comment("EN: Scale the paper doll dragon to human height, like the other paper dolls.",
+                    "Default: true.",
+                    "中文：把纸娃娃里的龙缩放到人类身高，和其他纸娃娃一致。默认：true")
+            .define("paperDollHumanScale", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {

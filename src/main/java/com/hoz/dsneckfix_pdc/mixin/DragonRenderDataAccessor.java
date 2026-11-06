@@ -36,4 +36,10 @@ public interface DragonRenderDataAccessor {
 
     @Accessor("currentTailMotionUp")
     void ds$setCurrentTailMotionUp(double currentTailMotionUp);
+
+    @Accessor("visualScale")
+    void ds$setVisualScale(double visualScale);
+
+    @Accessor("bodyScaleMultiplier")
+    void ds$setBodyScaleMultiplier(float bodyScaleMultiplier);
 }
