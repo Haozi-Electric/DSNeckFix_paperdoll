@@ -8,6 +8,7 @@ import com.geckolib.renderer.base.GeoRenderState;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
 import com.hoz.dsneckfix_pdc.client.LegacyMovementRefresh;
 import com.hoz.dsneckfix_pdc.client.PaperDollSway;
+import com.hoz.dsneckfix_pdc.client.RidingChainPaperDoll;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -21,6 +22,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.List;
 
 /**
  * Fuzss PaperDoll compat — makes the paper doll render the player as a DragonSurvival dragon.
@@ -63,12 +66,26 @@ public abstract class FuzsPaperDollRendererMixin {
             if (!(livingEntity instanceof Player player) || !DragonStateProvider.isDragon(player)) {
                 return;
             }
-            DragonEntity dragon = ClientDragonRenderer.getDragon(player);
+
+            // When riding another dragon, the chain root becomes the main doll node; the rest is
+            // submitted by RidingChainPaperDoll into the same picture-in-picture render.
+            List<LivingEntity> chain = null;
+            Player displayPlayer = player;
+            if (DsNeckFix.isPaperDollRidingChainEnabled()) {
+                chain = RidingChainPaperDoll.buildChain(player);
+                if (chain != null && chain.get(0) instanceof Player root) {
+                    displayPlayer = root;
+                } else {
+                    chain = null;
+                }
+            }
+
+            DragonEntity dragon = ClientDragonRenderer.getDragon(displayPlayer);
             if (dragon == null) {
                 return;
             }
             // DS 2.1.7 ticks movement on the client; older 26.1 builds need this render-time refresh.
-            LegacyMovementRefresh.refresh(player);
+            LegacyMovementRefresh.refresh(displayPlayer);
             EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             EntityRenderer<? super LivingEntity, ?> renderer = dispatcher.getRenderer(dragon);
             EntityRenderState renderState = renderer.createRenderState(dragon, partialTick);
@@ -81,13 +98,16 @@ public abstract class FuzsPaperDollRendererMixin {
                         accessor.ds$setVisualScale(1.0D);
                         accessor.ds$setBodyScaleMultiplier(1.0F);
                     }
-                    PaperDollSway.apply(renderData, player);
+                    PaperDollSway.apply(renderData, displayPlayer);
                 }
             }
             LivingEntityRenderState living = (LivingEntityRenderState) renderState;
             living.lightCoords = 15728880;
             living.shadowPieces.clear();
             living.outlineColor = 0;
+            if (chain != null && chain.size() > 1) {
+                RidingChainPaperDoll.plan(living, chain);
+            }
             cir.setReturnValue(living);
         } catch (final RuntimeException | LinkageError ignored) {
             // New DS/Fuzs version: let the host render its normal player model.

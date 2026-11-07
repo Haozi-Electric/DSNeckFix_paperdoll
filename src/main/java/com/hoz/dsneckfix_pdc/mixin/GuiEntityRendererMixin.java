@@ -4,14 +4,19 @@ import by.dragonsurvivalteam.dragonsurvival.client.render.entity.dragon.DragonRe
 import com.geckolib.renderer.base.GeoRenderState;
 import com.hoz.dsneckfix_pdc.DsNeckFix;
 import com.hoz.dsneckfix_pdc.client.BoneCacheGuard;
+import com.hoz.dsneckfix_pdc.client.RidingChainPaperDoll;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
+import net.minecraft.world.entity.LivingEntity;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+
+import java.util.List;
 
 /**
  * Scopes the compat flag and DS's shared bone caches to the paper doll's OWN render pass.
@@ -37,24 +42,39 @@ public abstract class GuiEntityRendererMixin {
             return;
         }
 
-        boolean guarded = false;
+        List<LivingEntity> chain = null;
+        try {
+            chain = RidingChainPaperDoll.takePlan(entityState.renderState());
+        } catch (final RuntimeException | LinkageError ignored) {
+            // Chain support is optional; render the root node only.
+        }
+        if (chain != null) {
+            RidingChainPaperDoll.beginSeatCapture();
+        }
+
         try {
             BoneCacheGuard.begin(ds$dragonId(data));
-            guarded = true;
         } catch (final RuntimeException | LinkageError ignored) {
             // Bone cache layout changed; compat rendering still works without the guard.
         }
         DsNeckFix.pushCompatRendering();
         try {
             original.call(entityState, poseStack);
-        } finally {
-            DsNeckFix.popCompatRendering();
-            if (guarded) {
-                try {
-                    BoneCacheGuard.restoreAll();
-                } catch (final RuntimeException | LinkageError ignored) {
-                    // Ignore; the cache guard is best-effort.
+            if (chain != null) {
+                final Matrix4f rootSeat = RidingChainPaperDoll.takeSeat();
+                if (rootSeat != null) {
+                    RidingChainPaperDoll.renderExtras(entityState, poseStack, chain, rootSeat);
                 }
+            }
+        } finally {
+            if (chain != null) {
+                RidingChainPaperDoll.cancelSeatCapture();
+            }
+            DsNeckFix.popCompatRendering();
+            try {
+                BoneCacheGuard.restoreAll();
+            } catch (final RuntimeException | LinkageError ignored) {
+                // Ignore; the cache guard is best-effort.
             }
         }
     }

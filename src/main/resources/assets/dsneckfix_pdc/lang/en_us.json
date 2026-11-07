@@ -1,0 +1,12 @@
+{
+  "dsneckfix_pdc.configuration.paperDollGlideSway": "Paper doll glide sway",
+  "dsneckfix_pdc.configuration.paperDollGlideSway.tooltip": "Sway the paper-doll dragon while gliding (dive pitch + tail), like the third-person dragon.\nDefault: true",
+  "dsneckfix_pdc.configuration.paperDollAlwaysShow": "Always show paper doll",
+  "dsneckfix_pdc.configuration.paperDollAlwaysShow.tooltip": "Always show the paper doll instead of letting it auto-hide.\nDefault: false",
+  "dsneckfix_pdc.configuration.paperDollHumanScale": "Human-sized paper doll",
+  "dsneckfix_pdc.configuration.paperDollHumanScale.tooltip": "Scale the paper-doll dragon to human height, like the other paper dolls.\nDefault: true",
+  "dsneckfix_pdc.configuration.paperDollRidingChain": "Paper doll riding chain",
+  "dsneckfix_pdc.configuration.paperDollRidingChain.tooltip": "Render the full DragonSurvival riding chain in the Fuzs paper doll.\nDefault: true",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations": "Dragon hurt and death animations",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations.tooltip": "Show DragonSurvival dragons with the vanilla hurt flash and death fall.\nDefault: true"
+}

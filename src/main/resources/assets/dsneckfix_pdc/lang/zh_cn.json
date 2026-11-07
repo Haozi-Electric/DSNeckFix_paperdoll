@@ -1,0 +1,12 @@
+{
+  "dsneckfix_pdc.configuration.paperDollGlideSway": "纸娃娃滑翔俯仰",
+  "dsneckfix_pdc.configuration.paperDollGlideSway.tooltip": "滑翔时让纸娃娃中的龙像世界中的龙一样摆动（俯冲俯仰 + 尾巴）。\n默认：true",
+  "dsneckfix_pdc.configuration.paperDollAlwaysShow": "一直显示纸娃娃",
+  "dsneckfix_pdc.configuration.paperDollAlwaysShow.tooltip": "一直显示纸娃娃，而不是让它自动隐藏。\n默认：false",
+  "dsneckfix_pdc.configuration.paperDollHumanScale": "纸娃娃人类体型",
+  "dsneckfix_pdc.configuration.paperDollHumanScale.tooltip": "把纸娃娃里的龙缩放到普通人类身高，和其他纸娃娃一致。\n默认：true",
+  "dsneckfix_pdc.configuration.paperDollRidingChain": "纸娃娃骑乘链",
+  "dsneckfix_pdc.configuration.paperDollRidingChain.tooltip": "让 Fuzs 纸娃娃渲染完整的龙之生存骑乘链。\n默认：true",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations": "龙受伤与死亡动画",
+  "dsneckfix_pdc.configuration.dragonDamageAnimations.tooltip": "让龙之生存的龙显示原版的受伤红光与死亡倾倒动画。\n默认：true"
+}

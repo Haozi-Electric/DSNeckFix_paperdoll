@@ -15,6 +15,7 @@ public class DsNeckFix {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     private static int compatRenderingDepth;
+    private static int chainRenderingDepth;
 
     public DsNeckFix(final ModContainer modContainer) {
         LOGGER.info("DS Neck Fix loaded");
@@ -41,6 +42,31 @@ public class DsNeckFix {
     /** Whether paper-doll dragons are normalized to human height. */
     public static boolean isPaperDollHumanScaleEnabled() {
         return Config.PAPER_DOLL_HUMAN_SCALE.get();
+    }
+
+    /** Whether the Fuzs paper doll renders the full riding chain. */
+    public static boolean isPaperDollRidingChainEnabled() {
+        return Config.PAPER_DOLL_RIDING_CHAIN.get();
+    }
+
+    /** Whether dragons copy the player's vanilla hurt flash and death fall. */
+    public static boolean isDragonDamageAnimationsEnabled() {
+        return Config.DRAGON_DAMAGE_ANIMATIONS.get();
+    }
+
+    /** Set while the paper doll renders extra riding-chain nodes, so DS skips its world seat offset. */
+    public static boolean isRenderingRidingChain() {
+        return chainRenderingDepth > 0;
+    }
+
+    public static void pushChainRendering() {
+        chainRenderingDepth++;
+    }
+
+    public static void popChainRendering() {
+        if (chainRenderingDepth > 0) {
+            chainRenderingDepth--;
+        }
     }
 
     public static void pushCompatRendering() {
